@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "playertimelimit",
+  "version": "${version}",
+  "name": "PlayerTimeLimit",
+  "description": "control de tiempo de jugadores",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/playertimelimit/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.TNTStudios.playertimelimit.client.PlayertimelimitClient"
+    ],
+    "main": [
+      "com.TNTStudios.playertimelimit.Playertimelimit"
+    ]
+  },
+  "mixins": [
+    "playertimelimit.mixins.json",
+    {
+      "config": "playertimelimit.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
