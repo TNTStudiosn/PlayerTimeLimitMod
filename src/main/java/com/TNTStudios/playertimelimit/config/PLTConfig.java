@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.io.FileWriter;
 
 public class PLTConfig {
 
@@ -44,7 +45,12 @@ public class PLTConfig {
         try {
             File configFile = Paths.get("config", "playertimelimit.yaml").toFile();
             if (!configFile.exists()) {
-                System.out.println("[PlayerTimeLimit] Config file not found. Using defaults.");
+                // Crear archivo con valores por defecto
+                configFile.getParentFile().mkdirs();
+                try (FileWriter writer = new FileWriter(configFile)) {
+                    writer.write(defaultYaml());
+                    System.out.println("[PlayerTimeLimit] Archivo de configuración creado por defecto.");
+                }
                 return;
             }
 
@@ -79,13 +85,14 @@ public class PLTConfig {
             mensajes.bienvenida = (String) msgs.getOrDefault("bienvenida", mensajes.bienvenida);
             mensajes.pausado = (String) msgs.getOrDefault("pausado", mensajes.pausado);
 
-            System.out.println("[PlayerTimeLimit] Config loaded successfully.");
+            System.out.println("[PlayerTimeLimit] Config cargada correctamente.");
 
         } catch (Exception e) {
-            System.err.println("[PlayerTimeLimit] Error loading config: " + e.getMessage());
+            System.err.println("[PlayerTimeLimit] Error al cargar la configuración: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
 
     public static LocalTime getHoraReinicio() {
         try {
@@ -102,4 +109,37 @@ public class PLTConfig {
             return ZoneId.of("UTC");
         }
     }
+
+    private static String defaultYaml() {
+        return """
+# Configuración de TNTLimitTime
+bossbar:
+  message: "Tiempo restante: %horas%h %minutos%m %segundos%s"
+  color: WHITE
+
+reinicio:
+  hora: "00:00"
+  zonaHoraria: "America/Mexico_City"
+
+advertencias:
+  - tiempo: 1800
+    mensaje: "⏳ Quedan 30 minutos de juego."
+  - tiempo: 900
+    mensaje: "⏳ Quedan 15 minutos de juego. ¡Aprovecha tu tiempo!"
+  - tiempo: 120
+    mensaje: "⏳ Quedan 2 minutos. ¡Prepárate para terminar!"
+
+tiempoPorDefecto: 18000
+
+mensajes:
+  tiempoAgotado: " Tu tiempo de juego para hoy ha terminado. ¡Nos vemos mañana!"
+  tiempoRestante: "✨ Tienes %tiempo% segundos de juego restantes. ¡Disfruta!"
+  tiempoAgregado: " ¡Se han agregado %tiempo% segundos a tu tiempo de juego!"
+  tiempoRemovido: " Se han removido %tiempo% segundos de tu tiempo de juego."
+  tiempoRestablecido: " Tu tiempo de juego ha sido restablecido a %tiempo% segundos."
+  bienvenida: " ¡Bienvenido! Tienes %tiempo% restantes de tiempo de juego por hoy ⏳. ¡Aprovecha al máximo cada momento!"
+  pausado: "✨ Tu tiempo está actualmente pausado."
+""";
+    }
+
 }
