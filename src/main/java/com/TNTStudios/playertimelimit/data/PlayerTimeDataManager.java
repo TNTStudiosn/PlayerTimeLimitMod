@@ -40,6 +40,13 @@ public class PlayerTimeDataManager {
         save();
     }
 
+    public static void resetAll() {
+        for (UUID uuid : playerTimes.keySet()) {
+            resetTime(uuid);
+        }
+    }
+
+
     public static void addTime(UUID uuid, int seconds) {
         PlayerData data = getOrCreate(uuid);
         data.timeRemaining += seconds;
@@ -114,4 +121,5 @@ public class PlayerTimeDataManager {
             this.timeRemaining = timeRemaining;
         }
     }
+
 }

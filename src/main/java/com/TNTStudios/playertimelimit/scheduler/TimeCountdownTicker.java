@@ -6,6 +6,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import java.time.LocalTime;
+import java.time.ZoneId;
 
 import java.util.*;
 
@@ -13,6 +15,7 @@ public class TimeCountdownTicker {
 
     private static int tickCounter = 0;
     private static final Map<UUID, Set<Integer>> advertenciasEnviadas = new HashMap<>();
+    private static String ultimaFechaReinicio = ""; // yyyy-MM-dd
 
     public static void register() {
         ServerTickEvents.START_SERVER_TICK.register(server -> {
@@ -26,6 +29,9 @@ public class TimeCountdownTicker {
 
     private static void tick(MinecraftServer server) {
         PlayerTimeDataManager.tickAll();
+
+        // Reinicio diario por zona horaria
+        verificarReinicioDiario(server);
 
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             UUID uuid = player.getUuid();
@@ -46,6 +52,32 @@ public class TimeCountdownTicker {
                     }
                 }
             }
+        }
+    }
+
+    private static void verificarReinicioDiario(MinecraftServer server) {
+        ZoneId zona = PLTConfig.getZonaHoraria();
+        LocalTime horaConfig = PLTConfig.getHoraReinicio();
+        LocalTime ahora = LocalTime.now(zona);
+        String fechaHoy = java.time.LocalDate.now(zona).toString(); // yyyy-MM-dd
+
+        if (ultimaFechaReinicio.equals(fechaHoy)) return; // Ya se hizo hoy
+
+        if (ahora.getHour() == horaConfig.getHour() && ahora.getMinute() == horaConfig.getMinute()) {
+            // Reiniciar a todos
+            System.out.println("[PlayerTimeLimit] Reiniciando tiempos diarios a todos los jugadores...");
+
+            for (ServerPlayerEntity jugador : server.getPlayerManager().getPlayerList()) {
+                PlayerTimeDataManager.resetTime(jugador.getUuid());
+                jugador.sendMessage(Text.of("♻ Tu tiempo ha sido reiniciado."), false);
+                resetAdvertencias(jugador.getUuid());
+            }
+
+            // También reiniciamos jugadores offline (persistencia)
+            PlayerTimeDataManager.resetAll();
+            PlayerTimeDataManager.save(); // fuerza guardado tras el reinicio
+
+            ultimaFechaReinicio = fechaHoy;
         }
     }
 
