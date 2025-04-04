@@ -2,6 +2,7 @@ package com.TNTStudios.playertimelimit.events;
 
 import com.TNTStudios.playertimelimit.config.PLTConfig;
 import com.TNTStudios.playertimelimit.data.PlayerTimeDataManager;
+import com.TNTStudios.playertimelimit.util.PLTTextUtils;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -21,8 +22,7 @@ public class PlayerJoinQuitEvents {
             } else {
                 // Enviar mensaje de bienvenida personalizado
                 int tiempo = PlayerTimeDataManager.getTime(player.getUuid());
-                String mensaje = PLTConfig.mensajes.bienvenida.replace("%tiempo%", String.valueOf(tiempo));
-                player.sendMessage(Text.of(mensaje), false);
+                PLTTextUtils.sendMessage(player, PLTConfig.mensajes.bienvenida, tiempo);
             }
         });
 

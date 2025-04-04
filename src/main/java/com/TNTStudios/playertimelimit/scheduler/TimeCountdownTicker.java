@@ -8,6 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import com.TNTStudios.playertimelimit.util.PLTTextUtils;
 
 import java.util.*;
 
@@ -47,7 +48,7 @@ public class TimeCountdownTicker {
                 if (tiempoRestante == adv.tiempo) {
                     Set<Integer> advertidas = advertenciasEnviadas.computeIfAbsent(uuid, k -> new HashSet<>());
                     if (!advertidas.contains(adv.tiempo)) {
-                        player.sendMessage(Text.of(adv.mensaje), false);
+                        PLTTextUtils.sendMessage(player, adv.mensaje, tiempoRestante);
                         advertidas.add(adv.tiempo);
                     }
                 }

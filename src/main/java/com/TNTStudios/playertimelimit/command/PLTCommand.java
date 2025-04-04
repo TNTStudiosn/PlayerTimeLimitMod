@@ -16,11 +16,11 @@ public class PLTCommand {
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
         dispatcher.register(CommandManager.literal("plt")
-                .requires(source -> source.hasPermissionLevel(2)) // acceso por defecto para operadores
+                .requires(source -> source.hasPermissionLevel(4)) // acceso por defecto para operadores
 
                 // /plt check <jugador>
                 .then(CommandManager.literal("check")
-                        .requires(source -> source.hasPermissionLevel(2))
+                        .requires(source -> source.hasPermissionLevel(4))
                         .then(CommandManager.argument("jugador", EntityArgumentType.player())
                                 .executes(ctx -> {
                                     ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "jugador");
@@ -32,7 +32,7 @@ public class PLTCommand {
 
                 // /plt resettime <jugador>
                 .then(CommandManager.literal("resettime")
-                        .requires(source -> source.hasPermissionLevel(2))
+                        .requires(source -> source.hasPermissionLevel(4))
                         .then(CommandManager.argument("jugador", EntityArgumentType.player())
                                 .executes(ctx -> {
                                     ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "jugador");
@@ -45,7 +45,7 @@ public class PLTCommand {
 
                 // /plt addtime <jugador> <segundos>
                 .then(CommandManager.literal("addtime")
-                        .requires(source -> source.hasPermissionLevel(2))
+                        .requires(source -> source.hasPermissionLevel(4))
                         .then(CommandManager.argument("jugador", EntityArgumentType.player())
                                 .then(CommandManager.argument("segundos", IntegerArgumentType.integer(1))
                                         .executes(ctx -> {
@@ -59,7 +59,7 @@ public class PLTCommand {
 
                 // /plt removetime <jugador> <segundos>
                 .then(CommandManager.literal("removetime")
-                        .requires(source -> source.hasPermissionLevel(2))
+                        .requires(source -> source.hasPermissionLevel(4))
                         .then(CommandManager.argument("jugador", EntityArgumentType.player())
                                 .then(CommandManager.argument("segundos", IntegerArgumentType.integer(1))
                                         .executes(ctx -> {
@@ -73,7 +73,7 @@ public class PLTCommand {
 
                 // /plt pausar <jugador>
                 .then(CommandManager.literal("pausar")
-                        .requires(source -> source.hasPermissionLevel(2))
+                        .requires(source -> source.hasPermissionLevel(4))
                         .then(CommandManager.argument("jugador", EntityArgumentType.player())
                                 .executes(ctx -> {
                                     ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "jugador");
@@ -85,7 +85,7 @@ public class PLTCommand {
 
                 // /plt reanudar <jugador>
                 .then(CommandManager.literal("reanudar")
-                        .requires(source -> source.hasPermissionLevel(2))
+                        .requires(source -> source.hasPermissionLevel(4))
                         .then(CommandManager.argument("jugador", EntityArgumentType.player())
                                 .executes(ctx -> {
                                     ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "jugador");
@@ -97,7 +97,7 @@ public class PLTCommand {
 
                 // /plt reload
                 .then(CommandManager.literal("reload")
-                        .requires(source -> source.hasPermissionLevel(2))
+                        .requires(source -> source.hasPermissionLevel(4))
                         .executes(ctx -> {
                             PLTConfig.loadConfig();
                             ctx.getSource().sendFeedback(() -> Text.of("♻ Configuración recargada"), false);
