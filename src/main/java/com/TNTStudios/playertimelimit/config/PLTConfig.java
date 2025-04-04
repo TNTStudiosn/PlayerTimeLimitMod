@@ -1,0 +1,105 @@
+package com.TNTStudios.playertimelimit.config;
+
+import java.io.File;
+import java.nio.file.Paths;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.*;
+
+public class PLTConfig {
+
+    public static class BossBarConfig {
+        public String message = "Tiempo restante: %horas%h %minutos%m %segundos%s";
+        public String color = "WHITE";
+    }
+
+    public static class Advertencia {
+        public int tiempo; // en segundos
+        public String mensaje;
+    }
+
+    public static class ReinicioConfig {
+        public String hora = "00:00";
+        public String zonaHoraria = "America/Mexico_City";
+    }
+
+    public static class Mensajes {
+        public String tiempoAgotado = " Tu tiempo de juego para hoy ha terminado. ¡Nos vemos mañana!";
+        public String tiempoRestante = "✨ Tienes %tiempo% segundos de juego restantes. ¡Disfruta!";
+        public String tiempoAgregado = " ¡Se han agregado %tiempo% segundos a tu tiempo de juego!";
+        public String tiempoRemovido = " Se han removido %tiempo% segundos de tu tiempo de juego.";
+        public String tiempoRestablecido = " Tu tiempo de juego ha sido restablecido a %tiempo% segundos.";
+        public String bienvenida = " ¡Bienvenido! Tienes %tiempo% restantes de tiempo de juego por hoy ⏳. ¡Aprovecha al máximo cada momento!";
+        public String pausado = "✨ Tu tiempo está actualmente pausado.";
+    }
+
+    public static BossBarConfig bossbar = new BossBarConfig();
+    public static ReinicioConfig reinicio = new ReinicioConfig();
+    public static List<Advertencia> advertencias = new ArrayList<>();
+    public static int tiempoPorDefecto = 18000;
+    public static Mensajes mensajes = new Mensajes();
+
+    @SuppressWarnings("unchecked")
+    public static void loadConfig() {
+        try {
+            File configFile = Paths.get("config", "playertimelimit.yaml").toFile();
+            if (!configFile.exists()) {
+                System.out.println("[PlayerTimeLimit] Config file not found. Using defaults.");
+                return;
+            }
+
+            org.yaml.snakeyaml.Yaml yaml = new org.yaml.snakeyaml.Yaml();
+            Map<String, Object> root = yaml.load(new java.io.FileReader(configFile));
+
+            Map<String, Object> bb = (Map<String, Object>) root.getOrDefault("bossbar", new HashMap<>());
+            bossbar.message = (String) bb.getOrDefault("message", bossbar.message);
+            bossbar.color = (String) bb.getOrDefault("color", bossbar.color);
+
+            Map<String, Object> rein = (Map<String, Object>) root.getOrDefault("reinicio", new HashMap<>());
+            reinicio.hora = (String) rein.getOrDefault("hora", reinicio.hora);
+            reinicio.zonaHoraria = (String) rein.getOrDefault("zonaHoraria", reinicio.zonaHoraria);
+
+            List<Map<String, Object>> advs = (List<Map<String, Object>>) root.getOrDefault("advertencias", new ArrayList<>());
+            advertencias.clear();
+            for (Map<String, Object> entry : advs) {
+                Advertencia adv = new Advertencia();
+                adv.tiempo = (int) entry.get("tiempo");
+                adv.mensaje = (String) entry.get("mensaje");
+                advertencias.add(adv);
+            }
+
+            tiempoPorDefecto = (int) root.getOrDefault("tiempoPorDefecto", tiempoPorDefecto);
+
+            Map<String, Object> msgs = (Map<String, Object>) root.getOrDefault("mensajes", new HashMap<>());
+            mensajes.tiempoAgotado = (String) msgs.getOrDefault("tiempoAgotado", mensajes.tiempoAgotado);
+            mensajes.tiempoRestante = (String) msgs.getOrDefault("tiempoRestante", mensajes.tiempoRestante);
+            mensajes.tiempoAgregado = (String) msgs.getOrDefault("tiempoAgregado", mensajes.tiempoAgregado);
+            mensajes.tiempoRemovido = (String) msgs.getOrDefault("tiempoRemovido", mensajes.tiempoRemovido);
+            mensajes.tiempoRestablecido = (String) msgs.getOrDefault("tiempoRestablecido", mensajes.tiempoRestablecido);
+            mensajes.bienvenida = (String) msgs.getOrDefault("bienvenida", mensajes.bienvenida);
+            mensajes.pausado = (String) msgs.getOrDefault("pausado", mensajes.pausado);
+
+            System.out.println("[PlayerTimeLimit] Config loaded successfully.");
+
+        } catch (Exception e) {
+            System.err.println("[PlayerTimeLimit] Error loading config: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static LocalTime getHoraReinicio() {
+        try {
+            return LocalTime.parse(reinicio.hora);
+        } catch (Exception e) {
+            return LocalTime.MIDNIGHT;
+        }
+    }
+
+    public static ZoneId getZonaHoraria() {
+        try {
+            return ZoneId.of(reinicio.zonaHoraria);
+        } catch (Exception e) {
+            return ZoneId.of("UTC");
+        }
+    }
+}
