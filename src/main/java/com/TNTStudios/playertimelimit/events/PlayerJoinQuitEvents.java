@@ -2,6 +2,7 @@ package com.TNTStudios.playertimelimit.events;
 
 import com.TNTStudios.playertimelimit.config.PLTConfig;
 import com.TNTStudios.playertimelimit.data.PlayerTimeDataManager;
+import com.TNTStudios.playertimelimit.networking.BossBarHandler;
 import com.TNTStudios.playertimelimit.util.PLTTextUtils;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -12,6 +13,9 @@ public class PlayerJoinQuitEvents {
     public static void register() {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             ServerPlayerEntity player = handler.player;
+
+            // Después de enviar el mensaje de bienvenida
+            BossBarHandler.ensureBossBarFor(player);
 
             // Cargar o inicializar tiempo
             PlayerTimeDataManager.onPlayerJoin(player);

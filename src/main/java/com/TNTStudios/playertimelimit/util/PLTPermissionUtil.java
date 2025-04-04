@@ -16,10 +16,14 @@ public class PLTPermissionUtil {
      * Verifica si el jugador tiene un permiso específico.
      */
     public static boolean has(ServerCommandSource source, String node) {
+        if (!initialized) {
+            tryInitLuckPerms();
+        }
+
         if (source.hasPermissionLevel(4)) return true;
 
         if (!(source.getEntity() instanceof ServerPlayerEntity player)) {
-            return false;
+            return true; // Permitir comandos desde consola u otras fuentes sin entidad
         }
 
         if (!initialized) {
@@ -31,6 +35,9 @@ public class PLTPermissionUtil {
             if (user != null) {
                 return user.getCachedData().getPermissionData(QueryOptions.defaultContextualOptions()).checkPermission(node).asBoolean();
             }
+
+            return source.hasPermissionLevel(4);
+
         }
 
         // Fallback si no hay LuckPerms: solo operadores

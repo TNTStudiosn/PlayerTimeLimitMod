@@ -80,4 +80,22 @@ public class BossBarHandler {
             return BossBar.Color.WHITE;
         }
     }
+
+    public static void ensureBossBarFor(ServerPlayerEntity player) {
+        UUID uuid = player.getUuid();
+        ServerBossBar bar = barras.get(uuid);
+        if (bar == null) {
+            bar = new ServerBossBar(
+                    Text.of("Tiempo restante"),
+                    getColorFromConfig(),
+                    BossBar.Style.PROGRESS
+            );
+            bar.setVisible(true);
+            barras.put(uuid, bar);
+        }
+        if (!bar.getPlayers().contains(player)) {
+            bar.addPlayer(player);
+        }
+    }
+
 }
