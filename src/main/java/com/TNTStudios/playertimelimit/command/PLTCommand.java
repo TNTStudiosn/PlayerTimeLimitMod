@@ -172,6 +172,7 @@ public class PLTCommand {
                         .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.reload"))
                         .executes(ctx -> {
                             PLTConfig.loadConfig();
+                            TimeCountdownTicker.clearUltimaFechaReinicio();
                             ctx.getSource().sendFeedback(() -> Text.of("♻ Configuración recargada"), false);
                             return 1;
                         }))

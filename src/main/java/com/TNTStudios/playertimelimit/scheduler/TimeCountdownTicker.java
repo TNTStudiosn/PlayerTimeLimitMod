@@ -96,6 +96,9 @@ public class TimeCountdownTicker {
         }
     }
 
+    public static void clearUltimaFechaReinicio() {
+        ultimaFechaReinicio = "";
+    }
 
     public static void resetAdvertencias(UUID uuid) {
         advertenciasEnviadas.remove(uuid);
