@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,18 +21,6 @@ public class PlayerTimeDataManager {
 
     private static final Map<UUID, PlayerData> playerTimes = new ConcurrentHashMap<>();
 
-    public static void tickAll() {
-        for (Map.Entry<UUID, PlayerData> entry : playerTimes.entrySet()) {
-            PlayerData data = entry.getValue();
-            if (!data.paused && data.timeRemaining > 0) {
-                data.timeRemaining--;
-
-                if (data.timeRemaining == 0) {
-                    data.outOfTime = true;
-                }
-            }
-        }
-    }
 
     public static void resetTime(UUID uuid) {
         PlayerData data = getOrCreate(uuid);
@@ -76,6 +65,19 @@ public class PlayerTimeDataManager {
         return getOrCreate(uuid).timeRemaining;
     }
 
+    public static void setTime(UUID uuid, int seconds) {
+        getOrCreate(uuid).timeRemaining = seconds;
+        save();
+    }
+
+    public static void markOutOfTime(UUID uuid) {
+        getOrCreate(uuid).outOfTime = true;
+    }
+
+    public static Set<UUID> getAllUUIDs() {
+        return playerTimes.keySet();
+    }
+
     public static boolean shouldKick(UUID uuid) {
         return getOrCreate(uuid).outOfTime;
     }
@@ -101,7 +103,7 @@ public class PlayerTimeDataManager {
         }
     }
 
-    public static void save() {
+    public synchronized static void save() {
         try (FileWriter writer = new FileWriter(DATA_FILE)) {
             gson.toJson(playerTimes, writer);
         } catch (Exception e) {

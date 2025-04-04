@@ -29,7 +29,18 @@ public class TimeCountdownTicker {
     }
 
     private static void tick(MinecraftServer server) {
-        PlayerTimeDataManager.tickAll();
+        for (UUID uuid : PlayerTimeDataManager.getAllUUIDs()) {
+            if (PlayerTimeDataManager.isPaused(uuid)) continue;
+
+            int tiempo = PlayerTimeDataManager.getTime(uuid);
+            if (tiempo > 0) {
+                PlayerTimeDataManager.setTime(uuid, tiempo - 1);
+                if (tiempo - 1 == 0) {
+                    PlayerTimeDataManager.markOutOfTime(uuid);
+                }
+            }
+        }
+
 
         // Reinicio diario por zona horaria
         verificarReinicioDiario(server);
