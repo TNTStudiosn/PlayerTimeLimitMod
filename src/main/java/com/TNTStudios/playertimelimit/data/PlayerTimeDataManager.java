@@ -2,6 +2,7 @@ package com.TNTStudios.playertimelimit.data;
 
 import com.TNTStudios.playertimelimit.config.PLTConfig;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -17,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlayerTimeDataManager {
 
     private static final File DATA_FILE = new File("config/playertimes.json");
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private static final Map<UUID, PlayerData> playerTimes = new ConcurrentHashMap<>();
 
