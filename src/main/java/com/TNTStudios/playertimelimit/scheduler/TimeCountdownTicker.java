@@ -79,22 +79,23 @@ public class TimeCountdownTicker {
         if (ultimaFechaReinicio.equals(fechaHoy)) return; // Ya se hizo hoy
 
         if (ahora.getHour() == horaConfig.getHour() && ahora.getMinute() == horaConfig.getMinute()) {
-            // Reiniciar a todos
+            // 🟢 Reiniciar a todos (conectados y no conectados)
             System.out.println("[PlayerTimeLimit] Reiniciando tiempos diarios a todos los jugadores...");
 
-            for (ServerPlayerEntity jugador : server.getPlayerManager().getPlayerList()) {
-                PlayerTimeDataManager.resetTime(jugador.getUuid());
-                jugador.sendMessage(Text.of("♻ Tu tiempo ha sido reiniciado."), false);
-                resetAdvertencias(jugador.getUuid());
-            }
+            PlayerTimeDataManager.resetAll(); // afecta a todos los uuids cargados
+            PlayerTimeDataManager.save();     // persistimos
 
-            // También reiniciamos jugadores offline (persistencia)
-            PlayerTimeDataManager.resetAll();
-            PlayerTimeDataManager.save(); // fuerza guardado tras el reinicio
+            // 🟢 A los conectados les mandamos mensaje y reiniciamos advertencias
+            for (ServerPlayerEntity jugador : server.getPlayerManager().getPlayerList()) {
+                UUID uuid = jugador.getUuid();
+                jugador.sendMessage(Text.of("♻ Tu tiempo ha sido reiniciado."), false);
+                resetAdvertencias(uuid);
+            }
 
             ultimaFechaReinicio = fechaHoy;
         }
     }
+
 
     public static void resetAdvertencias(UUID uuid) {
         advertenciasEnviadas.remove(uuid);
