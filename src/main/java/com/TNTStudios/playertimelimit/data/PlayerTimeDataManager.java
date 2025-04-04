@@ -46,7 +46,6 @@ public class PlayerTimeDataManager {
         }
     }
 
-
     public static void addTime(UUID uuid, int seconds) {
         PlayerData data = getOrCreate(uuid);
         data.timeRemaining += seconds;
@@ -83,7 +82,9 @@ public class PlayerTimeDataManager {
 
     public static void onPlayerJoin(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();
-        playerTimes.putIfAbsent(uuid, new PlayerData(PLTConfig.tiempoPorDefecto));
+        String name = player.getName().getString();
+        PlayerData data = playerTimes.computeIfAbsent(uuid, id -> new PlayerData(PLTConfig.tiempoPorDefecto, name));
+        data.name = name; // actualiza el nombre si cambió
     }
 
     public static void load() {
@@ -109,17 +110,18 @@ public class PlayerTimeDataManager {
     }
 
     private static PlayerData getOrCreate(UUID uuid) {
-        return playerTimes.computeIfAbsent(uuid, id -> new PlayerData(PLTConfig.tiempoPorDefecto));
+        return playerTimes.computeIfAbsent(uuid, id -> new PlayerData(PLTConfig.tiempoPorDefecto, "Desconocido"));
     }
 
     private static class PlayerData {
         int timeRemaining;
         boolean paused = false;
         boolean outOfTime = false;
+        String name;
 
-        PlayerData(int timeRemaining) {
+        PlayerData(int timeRemaining, String name) {
             this.timeRemaining = timeRemaining;
+            this.name = name;
         }
     }
-
 }

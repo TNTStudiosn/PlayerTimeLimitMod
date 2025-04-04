@@ -3,106 +3,208 @@ package com.TNTStudios.playertimelimit.command;
 import com.TNTStudios.playertimelimit.config.PLTConfig;
 import com.TNTStudios.playertimelimit.data.PlayerTimeDataManager;
 import com.TNTStudios.playertimelimit.scheduler.TimeCountdownTicker;
+import com.TNTStudios.playertimelimit.util.OfflinePlayerUtil;
+import com.TNTStudios.playertimelimit.util.PLTPermissionUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+
+import java.util.Optional;
+import java.util.UUID;
 
 public class PLTCommand {
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
         dispatcher.register(CommandManager.literal("plt")
-                .requires(source -> source.hasPermissionLevel(4)) // acceso por defecto para operadores
+                .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.admin"))
 
                 // /plt check <jugador>
                 .then(CommandManager.literal("check")
-                        .requires(source -> source.hasPermissionLevel(4))
-                        .then(CommandManager.argument("jugador", EntityArgumentType.player())
+                        .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.check"))
+                        .then(CommandManager.argument("nombre", StringArgumentType.word())
+                                .suggests((ctx, builder) -> {
+                                    for (String name : OfflinePlayerUtil.getAllKnownNames()) {
+                                        builder.suggest(name);
+                                    }
+                                    return builder.buildFuture();
+                                })
                                 .executes(ctx -> {
-                                    ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "jugador");
-                                    int tiempo = PlayerTimeDataManager.getTime(target.getUuid());
+                                    String nombre = StringArgumentType.getString(ctx, "nombre");
+                                    Optional<UUID> uuidOpt = OfflinePlayerUtil.getUUIDByName(nombre);
+                                    if (uuidOpt.isEmpty()) {
+                                        ctx.getSource().sendError(Text.of("❌ Jugador no encontrado: " + nombre));
+                                        return 0;
+                                    }
+
+                                    int tiempo = PlayerTimeDataManager.getTime(uuidOpt.get());
                                     ctx.getSource().sendFeedback(() ->
-                                            Text.of("⏳ Tiempo restante de " + target.getName().getString() + ": " + tiempo + " segundos"), false);
+                                            Text.of("⏳ Tiempo restante de " + nombre + ": " + tiempo + " segundos"), false);
                                     return 1;
                                 })))
 
                 // /plt resettime <jugador>
                 .then(CommandManager.literal("resettime")
-                        .requires(source -> source.hasPermissionLevel(4))
-                        .then(CommandManager.argument("jugador", EntityArgumentType.player())
+                        .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.resettime"))
+                        .then(CommandManager.argument("nombre", StringArgumentType.word())
+                                .suggests((ctx, builder) -> {
+                                    for (String name : OfflinePlayerUtil.getAllKnownNames()) {
+                                        builder.suggest(name);
+                                    }
+                                    return builder.buildFuture();
+                                })
                                 .executes(ctx -> {
-                                    ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "jugador");
-                                    PlayerTimeDataManager.resetTime(target.getUuid());
-                                    TimeCountdownTicker.resetAdvertencias(target.getUuid());
+                                    String nombre = StringArgumentType.getString(ctx, "nombre");
+                                    Optional<UUID> uuidOpt = OfflinePlayerUtil.getUUIDByName(nombre);
+                                    if (uuidOpt.isEmpty()) {
+                                        ctx.getSource().sendError(Text.of("❌ Jugador no encontrado: " + nombre));
+                                        return 0;
+                                    }
+                                    UUID uuid = uuidOpt.get();
+                                    PlayerTimeDataManager.resetTime(uuid);
+                                    TimeCountdownTicker.resetAdvertencias(uuid);
                                     ctx.getSource().sendFeedback(() ->
-                                            Text.of("⏹ Tiempo reiniciado para " + target.getName().getString()), false);
+                                            Text.of("⏹ Tiempo reiniciado para " + nombre), false);
                                     return 1;
                                 })))
 
                 // /plt addtime <jugador> <segundos>
                 .then(CommandManager.literal("addtime")
-                        .requires(source -> source.hasPermissionLevel(4))
-                        .then(CommandManager.argument("jugador", EntityArgumentType.player())
+                        .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.addtime"))
+                        .then(CommandManager.argument("nombre", StringArgumentType.word())
+                                .suggests((ctx, builder) -> {
+                                    for (String name : OfflinePlayerUtil.getAllKnownNames()) {
+                                        builder.suggest(name);
+                                    }
+                                    return builder.buildFuture();
+                                })
                                 .then(CommandManager.argument("segundos", IntegerArgumentType.integer(1))
                                         .executes(ctx -> {
-                                            ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "jugador");
+                                            String nombre = StringArgumentType.getString(ctx, "nombre");
                                             int secs = IntegerArgumentType.getInteger(ctx, "segundos");
-                                            PlayerTimeDataManager.addTime(target.getUuid(), secs);
+                                            Optional<UUID> uuidOpt = OfflinePlayerUtil.getUUIDByName(nombre);
+                                            if (uuidOpt.isEmpty()) {
+                                                ctx.getSource().sendError(Text.of("❌ Jugador no encontrado: " + nombre));
+                                                return 0;
+                                            }
+                                            PlayerTimeDataManager.addTime(uuidOpt.get(), secs);
                                             ctx.getSource().sendFeedback(() ->
-                                                    Text.of("✅ Se agregaron " + secs + " segundos a " + target.getName().getString()), false);
+                                                    Text.of("✅ Se agregaron " + secs + " segundos a " + nombre), false);
                                             return 1;
                                         }))))
 
                 // /plt removetime <jugador> <segundos>
                 .then(CommandManager.literal("removetime")
-                        .requires(source -> source.hasPermissionLevel(4))
-                        .then(CommandManager.argument("jugador", EntityArgumentType.player())
+                        .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.removetime"))
+                        .then(CommandManager.argument("nombre", StringArgumentType.word())
+                                .suggests((ctx, builder) -> {
+                                    for (String name : OfflinePlayerUtil.getAllKnownNames()) {
+                                        builder.suggest(name);
+                                    }
+                                    return builder.buildFuture();
+                                })
                                 .then(CommandManager.argument("segundos", IntegerArgumentType.integer(1))
                                         .executes(ctx -> {
-                                            ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "jugador");
+                                            String nombre = StringArgumentType.getString(ctx, "nombre");
                                             int secs = IntegerArgumentType.getInteger(ctx, "segundos");
-                                            PlayerTimeDataManager.removeTime(target.getUuid(), secs);
+                                            Optional<UUID> uuidOpt = OfflinePlayerUtil.getUUIDByName(nombre);
+                                            if (uuidOpt.isEmpty()) {
+                                                ctx.getSource().sendError(Text.of("❌ Jugador no encontrado: " + nombre));
+                                                return 0;
+                                            }
+                                            PlayerTimeDataManager.removeTime(uuidOpt.get(), secs);
                                             ctx.getSource().sendFeedback(() ->
-                                                    Text.of("⚠ Se eliminaron " + secs + " segundos a " + target.getName().getString()), false);
+                                                    Text.of("⚠ Se eliminaron " + secs + " segundos a " + nombre), false);
                                             return 1;
                                         }))))
 
                 // /plt pausar <jugador>
                 .then(CommandManager.literal("pausar")
-                        .requires(source -> source.hasPermissionLevel(4))
-                        .then(CommandManager.argument("jugador", EntityArgumentType.player())
+                        .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.pausar"))
+                        .then(CommandManager.argument("nombre", StringArgumentType.word())
+                                .suggests((ctx, builder) -> {
+                                    for (String name : OfflinePlayerUtil.getAllKnownNames()) {
+                                        builder.suggest(name);
+                                    }
+                                    return builder.buildFuture();
+                                })
                                 .executes(ctx -> {
-                                    ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "jugador");
-                                    PlayerTimeDataManager.pauseTime(target.getUuid());
+                                    String nombre = StringArgumentType.getString(ctx, "nombre");
+                                    Optional<UUID> uuidOpt = OfflinePlayerUtil.getUUIDByName(nombre);
+                                    if (uuidOpt.isEmpty()) {
+                                        ctx.getSource().sendError(Text.of("❌ Jugador no encontrado: " + nombre));
+                                        return 0;
+                                    }
+                                    PlayerTimeDataManager.pauseTime(uuidOpt.get());
                                     ctx.getSource().sendFeedback(() ->
-                                            Text.of("⏸ Tiempo pausado para " + target.getName().getString()), false);
+                                            Text.of("⏸ Tiempo pausado para " + nombre), false);
                                     return 1;
                                 })))
 
                 // /plt reanudar <jugador>
                 .then(CommandManager.literal("reanudar")
-                        .requires(source -> source.hasPermissionLevel(4))
-                        .then(CommandManager.argument("jugador", EntityArgumentType.player())
+                        .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.reanudar"))
+                        .then(CommandManager.argument("nombre", StringArgumentType.word())
+                                .suggests((ctx, builder) -> {
+                                    for (String name : OfflinePlayerUtil.getAllKnownNames()) {
+                                        builder.suggest(name);
+                                    }
+                                    return builder.buildFuture();
+                                })
                                 .executes(ctx -> {
-                                    ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "jugador");
-                                    PlayerTimeDataManager.resumeTime(target.getUuid());
+                                    String nombre = StringArgumentType.getString(ctx, "nombre");
+                                    Optional<UUID> uuidOpt = OfflinePlayerUtil.getUUIDByName(nombre);
+                                    if (uuidOpt.isEmpty()) {
+                                        ctx.getSource().sendError(Text.of("❌ Jugador no encontrado: " + nombre));
+                                        return 0;
+                                    }
+                                    PlayerTimeDataManager.resumeTime(uuidOpt.get());
                                     ctx.getSource().sendFeedback(() ->
-                                            Text.of("▶ Tiempo reanudado para " + target.getName().getString()), false);
+                                            Text.of("▶ Tiempo reanudado para " + nombre), false);
                                     return 1;
                                 })))
 
                 // /plt reload
                 .then(CommandManager.literal("reload")
-                        .requires(source -> source.hasPermissionLevel(4))
+                        .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.reload"))
                         .executes(ctx -> {
                             PLTConfig.loadConfig();
                             ctx.getSource().sendFeedback(() -> Text.of("♻ Configuración recargada"), false);
                             return 1;
                         }))
+
+                // /plt info <jugador>
+                .then(CommandManager.literal("info")
+                        .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.check"))
+                        .then(CommandManager.argument("nombre", StringArgumentType.word())
+                                .suggests((ctx, builder) -> {
+                                    for (String name : OfflinePlayerUtil.getAllKnownNames()) {
+                                        builder.suggest(name);
+                                    }
+                                    return builder.buildFuture();
+                                })
+                                .executes(ctx -> {
+                                    String nombre = StringArgumentType.getString(ctx, "nombre");
+                                    Optional<UUID> uuidOpt = OfflinePlayerUtil.getUUIDByName(nombre);
+                                    if (uuidOpt.isEmpty()) {
+                                        ctx.getSource().sendError(Text.of("❌ Jugador no encontrado: " + nombre));
+                                        return 0;
+                                    }
+                                    UUID uuid = uuidOpt.get();
+                                    int tiempo = PlayerTimeDataManager.getTime(uuid);
+                                    boolean pausado = PlayerTimeDataManager.isPaused(uuid);
+                                    boolean agotado = PlayerTimeDataManager.shouldKick(uuid);
+
+                                    ctx.getSource().sendFeedback(() -> Text.of(String.format(
+                                            "📄 Info de %s:\n⏳ Tiempo restante: %d segundos\n⏸ Pausado: %s\n❌ Tiempo agotado: %s",
+                                            nombre, tiempo, pausado, agotado
+                                    )), false);
+
+                                    return 1;
+                                })))
         );
     }
 }
