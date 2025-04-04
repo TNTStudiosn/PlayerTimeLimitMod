@@ -1,4 +1,4 @@
-# ⏱ PlayerTimeLimit
+# ⏱ Player Time Limit Mod
 
 **PlayerTimeLimit** es un mod para servidores (no cliente) de Minecraft en Fabric que permite establecer límites de tiempo de juego por jugador, reiniciarlos diariamente, y gestionar estos tiempos a través de comandos y una API pública. Ideal para servidores educativos, familiares o con control de juego.
 
