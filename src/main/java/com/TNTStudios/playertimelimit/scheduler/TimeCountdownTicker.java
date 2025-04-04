@@ -29,7 +29,10 @@ public class TimeCountdownTicker {
     }
 
     private static void tick(MinecraftServer server) {
-        for (UUID uuid : PlayerTimeDataManager.getAllUUIDs()) {
+        // ✅ Descontar tiempo solo a jugadores conectados
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            UUID uuid = player.getUuid();
+
             if (PlayerTimeDataManager.isPaused(uuid)) continue;
 
             int tiempo = PlayerTimeDataManager.getTime(uuid);
@@ -41,10 +44,10 @@ public class TimeCountdownTicker {
             }
         }
 
-
-        // Reinicio diario por zona horaria
+        // ✅ Reinicio diario
         verificarReinicioDiario(server);
 
+        // ✅ Advertencias
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             UUID uuid = player.getUuid();
             int tiempoRestante = PlayerTimeDataManager.getTime(uuid);
@@ -54,7 +57,6 @@ public class TimeCountdownTicker {
                 continue;
             }
 
-            // Advertencias personalizadas
             for (PLTConfig.Advertencia adv : PLTConfig.advertencias) {
                 if (tiempoRestante == adv.tiempo) {
                     Set<Integer> advertidas = advertenciasEnviadas.computeIfAbsent(uuid, k -> new HashSet<>());
@@ -66,6 +68,7 @@ public class TimeCountdownTicker {
             }
         }
     }
+
 
     private static void verificarReinicioDiario(MinecraftServer server) {
         ZoneId zona = PLTConfig.getZonaHoraria();
