@@ -15,7 +15,7 @@ public class PLTConfig {
     }
 
     public static class Advertencia {
-        public int tiempo; // en segundos
+        public int tiempo;
         public String mensaje;
     }
 
@@ -45,7 +45,6 @@ public class PLTConfig {
         try {
             File configFile = Paths.get("config", "playertimelimit.yaml").toFile();
             if (!configFile.exists()) {
-                // Crear archivo con valores por defecto
                 configFile.getParentFile().mkdirs();
                 try (FileWriter writer = new FileWriter(configFile)) {
                     writer.write(defaultYaml());

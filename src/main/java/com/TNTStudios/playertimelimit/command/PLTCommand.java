@@ -24,7 +24,6 @@ public class PLTCommand {
         dispatcher.register(CommandManager.literal("plt")
                 .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.admin"))
 
-                // /plt check <jugador>
                 .then(CommandManager.literal("check")
                         .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.check"))
                         .then(CommandManager.argument("nombre", StringArgumentType.word())
@@ -48,7 +47,6 @@ public class PLTCommand {
                                     return 1;
                                 })))
 
-                // /plt resettime <jugador>
                 .then(CommandManager.literal("resettime")
                         .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.resettime"))
                         .then(CommandManager.argument("nombre", StringArgumentType.word())
@@ -79,7 +77,6 @@ public class PLTCommand {
                                     return 1;
                                 })))
 
-                // /plt addtime <jugador> <segundos>
                 .then(CommandManager.literal("addtime")
                         .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.addtime"))
                         .then(CommandManager.argument("nombre", StringArgumentType.word())
@@ -110,7 +107,6 @@ public class PLTCommand {
                                             return 1;
                                         }))))
 
-                // /plt removetime <jugador> <segundos>
                 .then(CommandManager.literal("removetime")
                         .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.removetime"))
                         .then(CommandManager.argument("nombre", StringArgumentType.word())
@@ -141,7 +137,6 @@ public class PLTCommand {
                                             return 1;
                                         }))))
 
-                // /plt pausar <jugador>
                 .then(CommandManager.literal("pausar")
                         .requires(source -> PLTPermissionUtil.has(source, "PLimitTime.command.pausar"))
                         .then(CommandManager.argument("nombre", StringArgumentType.word())

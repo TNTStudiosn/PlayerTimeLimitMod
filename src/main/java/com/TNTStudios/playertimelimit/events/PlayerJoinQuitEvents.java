@@ -14,17 +14,13 @@ public class PlayerJoinQuitEvents {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             ServerPlayerEntity player = handler.player;
 
-            // Después de enviar el mensaje de bienvenida
             BossBarHandler.ensureBossBarFor(player);
 
-            // Cargar o inicializar tiempo
             PlayerTimeDataManager.onPlayerJoin(player);
 
-            // Verificar si debe ser kickeado
             if (PlayerTimeDataManager.shouldKick(player.getUuid())) {
                 player.networkHandler.disconnect(Text.of(PLTConfig.mensajes.tiempoAgotado));
             } else {
-                // Enviar mensaje de bienvenida personalizado
                 int tiempo = PlayerTimeDataManager.getTime(player.getUuid());
                 PLTTextUtils.sendMessage(player, PLTConfig.mensajes.bienvenida, tiempo);
             }

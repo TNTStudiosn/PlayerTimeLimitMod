@@ -23,7 +23,7 @@ public class PLTPermissionUtil {
         if (source.hasPermissionLevel(4)) return true;
 
         if (!(source.getEntity() instanceof ServerPlayerEntity player)) {
-            return true; // Permitir comandos desde consola u otras fuentes sin entidad
+            return true;
         }
 
         if (!initialized) {
@@ -40,7 +40,6 @@ public class PLTPermissionUtil {
 
         }
 
-        // Fallback si no hay LuckPerms: solo operadores
         return false;
     }
 
@@ -51,7 +50,6 @@ public class PLTPermissionUtil {
         try {
             luckPerms = LuckPermsProvider.get();
         } catch (IllegalStateException e) {
-            // LuckPerms no está disponible
             luckPerms = null;
         }
         initialized = true;

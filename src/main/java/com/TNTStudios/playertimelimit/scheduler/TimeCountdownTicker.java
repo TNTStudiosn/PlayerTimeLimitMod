@@ -16,12 +16,12 @@ public class TimeCountdownTicker {
 
     private static int tickCounter = 0;
     private static final Map<UUID, Set<Integer>> advertenciasEnviadas = new HashMap<>();
-    private static String ultimaFechaReinicio = ""; // yyyy-MM-dd
+    private static String ultimaFechaReinicio = "";
 
     public static void register() {
         ServerTickEvents.START_SERVER_TICK.register(server -> {
             tickCounter++;
-            if (tickCounter >= 20) { // Cada segundo
+            if (tickCounter >= 20) {
                 tickCounter = 0;
                 tick(server);
             }
@@ -29,7 +29,6 @@ public class TimeCountdownTicker {
     }
 
     private static void tick(MinecraftServer server) {
-        // ✅ Descontar tiempo solo a jugadores conectados
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             UUID uuid = player.getUuid();
 
@@ -44,10 +43,8 @@ public class TimeCountdownTicker {
             }
         }
 
-        // ✅ Reinicio diario
         verificarReinicioDiario(server);
 
-        // ✅ Advertencias
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             UUID uuid = player.getUuid();
             int tiempoRestante = PlayerTimeDataManager.getTime(uuid);
@@ -74,18 +71,16 @@ public class TimeCountdownTicker {
         ZoneId zona = PLTConfig.getZonaHoraria();
         LocalTime horaConfig = PLTConfig.getHoraReinicio();
         LocalTime ahora = LocalTime.now(zona);
-        String fechaHoy = java.time.LocalDate.now(zona).toString(); // yyyy-MM-dd
+        String fechaHoy = java.time.LocalDate.now(zona).toString();
 
-        if (ultimaFechaReinicio.equals(fechaHoy)) return; // Ya se hizo hoy
+        if (ultimaFechaReinicio.equals(fechaHoy)) return;
 
         if (ahora.getHour() == horaConfig.getHour() && ahora.getMinute() == horaConfig.getMinute()) {
-            // 🟢 Reiniciar a todos (conectados y no conectados)
             System.out.println("[PlayerTimeLimit] Reiniciando tiempos diarios a todos los jugadores...");
 
-            PlayerTimeDataManager.resetAll(); // afecta a todos los uuids cargados
-            PlayerTimeDataManager.save();     // persistimos
+            PlayerTimeDataManager.resetAll();
+            PlayerTimeDataManager.save();
 
-            // 🟢 A los conectados les mandamos mensaje y reiniciamos advertencias
             for (ServerPlayerEntity jugador : server.getPlayerManager().getPlayerList()) {
                 UUID uuid = jugador.getUuid();
                 jugador.sendMessage(Text.of("♻ Tu tiempo ha sido reiniciado."), false);

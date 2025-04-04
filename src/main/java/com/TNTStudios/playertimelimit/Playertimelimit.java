@@ -25,21 +25,17 @@ public class Playertimelimit implements ModInitializer {
     public void onInitialize() {
         System.out.println("[PlayerTimeLimit] Inicializando...");
 
-        // Cargar configuración y datos
         PLTConfig.loadConfig();
         PlayerTimeDataManager.load();
 
-        // Registrar eventos
         PlayerJoinQuitEvents.register();
         BossBarHandler.register();
         TimeCountdownTicker.register();
 
-        // Registrar comandos
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             PLTCommand.register(dispatcher, registryAccess);
         });
 
-        // Inicializar API
         api = new PlayerTimeLimitAPIImpl();
 
         System.out.println("[PlayerTimeLimit] Mod PlayerTimeLimit activo.");

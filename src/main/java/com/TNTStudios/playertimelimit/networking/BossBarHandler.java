@@ -48,7 +48,7 @@ public class BossBarHandler {
 
             if (paused) {
                 bar.setName(Text.of("⏸ Tiempo pausado"));
-                bar.setColor(BossBar.Color.WHITE); // Color neutro para pausa
+                bar.setColor(BossBar.Color.WHITE);
                 bar.setPercent(1.0f);
                 continue;
             }

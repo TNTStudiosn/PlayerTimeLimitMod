@@ -30,7 +30,7 @@ public class OfflinePlayerUtil {
                 }
             });
         } catch (Exception e) {
-            System.err.println("[PlayerTimeLimit] Error loading offline player names: " + e.getMessage());
+            System.err.println("[PlayerTimeLimit] Error al cargar los nombres de los jugadores sin conexión: " + e.getMessage());
         }
     }
 

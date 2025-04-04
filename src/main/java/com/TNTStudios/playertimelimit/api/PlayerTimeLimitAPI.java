@@ -11,3 +11,4 @@ public interface PlayerTimeLimitAPI {
     void pause(UUID uuid);
     void resume(UUID uuid);
 }
+
