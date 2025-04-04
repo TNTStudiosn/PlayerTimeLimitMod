@@ -27,8 +27,8 @@ public class PLTConfig {
     public static class Mensajes {
         public String tiempoAgotado = " Tu tiempo de juego para hoy ha terminado. ¡Nos vemos mañana!";
         public String tiempoRestante = "✨ Tienes %horas%h %minutos%m %segundos%s de juego restantes. ¡Disfruta!";
-        public String tiempoAgregado = " ¡Se han agregado %horas%h %minutos%m %segundos%s a tu tiempo de juego!";
-        public String tiempoRemovido = " Se han removido %horas%h %minutos%m %segundos%s de tu tiempo de juego.";
+        public String tiempoAgregado = " ¡Ahora tienes %horas%h %minutos%m %segundos%s tiempo de juego!";
+        public String tiempoRemovido = " ¡Ahora tienes %horas%h %minutos%m %segundos%s tiempo de juego!";
         public String tiempoRestablecido = " Tu tiempo de juego ha sido restablecido a %horas%h %minutos%m %segundos%s.";
         public String bienvenida = " ¡Bienvenido! Tienes %horas%h %minutos%m restantes de tiempo de juego por hoy ⏳. ¡Aprovecha al máximo cada momento!";
         public String pausado = "✨ Tu tiempo está actualmente pausado.";
@@ -134,8 +134,8 @@ tiempoPorDefecto: 18000
 mensajes:
   tiempoAgotado: " Tu tiempo de juego para hoy ha terminado. ¡Nos vemos mañana!"
   tiempoRestante: "✨ Tienes %horas%h %minutos%m %segundos%s de juego restantes. ¡Disfruta!"
-  tiempoAgregado: " ¡Se han agregado %horas%h %minutos%m %segundos%s a tu tiempo de juego!"
-  tiempoRemovido: " Se han removido %horas%h %minutos%m %segundos%s de tu tiempo de juego."
+  tiempoAgregado: " ¡Ahora tienes %horas%h %minutos%m %segundos%s tiempo de juego!"
+  tiempoRemovido: " ¡Ahora tienes %horas%h %minutos%m %segundos%s tiempo de juego!"
   tiempoRestablecido: " Tu tiempo de juego ha sido restablecido a %horas%h %minutos%m %segundos%s."
   bienvenida: " ¡Bienvenido! Tienes %horas%h %minutos%m restantes de tiempo de juego por hoy ⏳. ¡Aprovecha al máximo cada momento!"
   pausado: "✨ Tu tiempo está actualmente pausado."

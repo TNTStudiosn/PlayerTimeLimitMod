@@ -5,12 +5,14 @@ import com.TNTStudios.playertimelimit.data.PlayerTimeDataManager;
 import com.TNTStudios.playertimelimit.scheduler.TimeCountdownTicker;
 import com.TNTStudios.playertimelimit.util.OfflinePlayerUtil;
 import com.TNTStudios.playertimelimit.util.PLTPermissionUtil;
+import com.TNTStudios.playertimelimit.util.PLTTextUtils;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.Optional;
@@ -68,6 +70,12 @@ public class PLTCommand {
                                     TimeCountdownTicker.resetAdvertencias(uuid);
                                     ctx.getSource().sendFeedback(() ->
                                             Text.of("⏹ Tiempo reiniciado para " + nombre), false);
+
+                                    ServerPlayerEntity target = ctx.getSource().getServer().getPlayerManager().getPlayer(uuid);
+                                    if (target != null) {
+                                        PLTTextUtils.sendMessage(target, PLTConfig.mensajes.tiempoRestablecido, PlayerTimeDataManager.getTime(uuid));
+                                    }
+
                                     return 1;
                                 })))
 
@@ -90,9 +98,15 @@ public class PLTCommand {
                                                 ctx.getSource().sendError(Text.of("❌ Jugador no encontrado: " + nombre));
                                                 return 0;
                                             }
-                                            PlayerTimeDataManager.addTime(uuidOpt.get(), secs);
+                                            UUID uuid = uuidOpt.get();
+                                            PlayerTimeDataManager.addTime(uuid, secs);
                                             ctx.getSource().sendFeedback(() ->
                                                     Text.of("✅ Se agregaron " + secs + " segundos a " + nombre), false);
+
+                                            ServerPlayerEntity target = ctx.getSource().getServer().getPlayerManager().getPlayer(uuid);
+                                            if (target != null) {
+                                                PLTTextUtils.sendMessage(target, PLTConfig.mensajes.tiempoAgregado, PlayerTimeDataManager.getTime(uuid));
+                                            }
                                             return 1;
                                         }))))
 
@@ -115,9 +129,15 @@ public class PLTCommand {
                                                 ctx.getSource().sendError(Text.of("❌ Jugador no encontrado: " + nombre));
                                                 return 0;
                                             }
-                                            PlayerTimeDataManager.removeTime(uuidOpt.get(), secs);
+                                            UUID uuid = uuidOpt.get();
+                                            PlayerTimeDataManager.removeTime(uuid, secs);
                                             ctx.getSource().sendFeedback(() ->
                                                     Text.of("⚠ Se eliminaron " + secs + " segundos a " + nombre), false);
+
+                                            ServerPlayerEntity target = ctx.getSource().getServer().getPlayerManager().getPlayer(uuid);
+                                            if (target != null) {
+                                                PLTTextUtils.sendMessage(target, PLTConfig.mensajes.tiempoRemovido, PlayerTimeDataManager.getTime(uuid));
+                                            }
                                             return 1;
                                         }))))
 
